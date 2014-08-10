@@ -6,26 +6,30 @@ import redis
 base_url    = "https://www.mustakbil.com"
 #base_url    = "https://www.mustakbil.com/job/110036"
 http        = "http"
-url         = base_url
 queue       = []
-queue.append(url)
+queue.append("https://www.mustakbil.com")
 redis       = redis.StrictRedis(host='localhost', port=6379, db=0)
 key   = "mustakbil"
 
 
 
 
-def get_in_links(links):
+def get_in_links(page_url, links):
 
     in_links    = []
     for link in links:
         href    = link.get("href")
 
         if href and http not in href:
-            href = "%s%s" % (base_url, href) if href.startswith("/") else "%s/%s" % (base_url, href)
-            if "https://www.mustakbil.com/events/" not in href and not redis.exists("%s:%s" % (queue, href)):
+            href = "%s%s" % (base_url, href) if href.startswith("/") else "%s/%s" % (page_url, href)
+ 
+            if "https://www.mustakbil.com/events/" not in href and not redis.exists("%s:%s" % ("queue", href)):
+                print "url %s has been queued" % (href)
                 redis.set("%s:%s" % ("queue", href), 1)
                 in_links.append(href)
+            else:
+                print "%s has already been queued" % (href)
+
 
     return in_links
 
@@ -66,7 +70,7 @@ def init(queue):
 
 
     count = 0
-    while count<30:
+    while count<1:
         count +=1
         try:
 
@@ -81,16 +85,22 @@ def init(queue):
                 page        = urllib2.urlopen(req)
                 soup        = BeautifulSoup(page)
                 links       = soup.find_all("a")
-                ret_links   = get_in_links(links)
-                for link in ret_links:
-                    print link
+                print links
+                print "\n"  
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+                print "-----------------------------------------"
+
+                ret_links   = get_in_links(url, links)
                 queue       = queue + ret_links
                 redis.set("%s:%s" % (key, url), 1)
                 redis.sadd(key, url)
 
                 dict        = parse(url, soup)
-                print dict
-
             else:
                 print "%s already crawled ....." % (url)
 
@@ -100,3 +110,4 @@ def init(queue):
             pass
 
 init(queue)
+print queue
