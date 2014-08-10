@@ -12,8 +12,6 @@ redis       = redis.StrictRedis(host='localhost', port=6379, db=0)
 key   = "mustakbil"
 
 
-
-
 def get_in_links(page_url, links):
 
     in_links    = []
@@ -31,6 +29,7 @@ def get_in_links(page_url, links):
                 print "%s has already been queued" % (href)
 
 
+    in_links.reverse()
     return in_links
 
 
@@ -70,12 +69,13 @@ def init(queue):
 
 
     count = 0
-    while count<1:
+    while count<5:
         count +=1
         try:
 
             header      = {'User-Agent': 'Mozilla/5.0'}
             url         = queue.pop()
+            print count
 
             if not redis.exists("%s:%s" % (key, url)):
 
@@ -85,18 +85,8 @@ def init(queue):
                 page        = urllib2.urlopen(req)
                 soup        = BeautifulSoup(page)
                 links       = soup.find_all("a")
-                print links
-                print "\n"  
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-                print "-----------------------------------------"
-
                 ret_links   = get_in_links(url, links)
-                queue       = queue + ret_links
+                queue       = ret_links + queue
                 redis.set("%s:%s" % (key, url), 1)
                 redis.sadd(key, url)
 
