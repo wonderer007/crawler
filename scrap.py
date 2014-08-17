@@ -69,13 +69,13 @@ def init(queue):
 
 
     count = 0
-    while count< 1000:
+    while count< 5000:
         count +=1
         try:
             
             header      = {'User-Agent': 'Mozilla/5.0'}
             url         = queue.pop()
-            print count
+#            print count
 
             if not redis.exists("%s:%s" % (key, url)):
 
