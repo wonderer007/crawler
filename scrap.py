@@ -22,11 +22,11 @@ def get_in_links(page_url, links):
             href = "%s%s" % (base_url, href) if href.startswith("/") else "%s/%s" % (page_url, href)
  
             if "https://www.mustakbil.com/events/" not in href and not redis.exists("%s:%s" % ("queue", href)):
-                print "url %s has been queued" % (href)
+#                print "url %s has been queued" % (href)
                 redis.set("%s:%s" % ("queue", href), 1)
                 in_links.append(href)
-            else:
-                print "%s has already been queued" % (href)
+#            else:
+#               print "%s has already been queued" % (href)
 
 
     in_links.reverse()
@@ -69,17 +69,17 @@ def init(queue):
 
 
     count = 0
-    while count<5:
+    while count< 1000:
         count +=1
         try:
-
+            
             header      = {'User-Agent': 'Mozilla/5.0'}
             url         = queue.pop()
             print count
 
             if not redis.exists("%s:%s" % (key, url)):
 
-                print "crawling %s ... " % (url)
+#                print "crawling %s ... " % (url)
 
                 req         = urllib2.Request(url, headers=header)
                 page        = urllib2.urlopen(req)
@@ -91,11 +91,12 @@ def init(queue):
                 redis.sadd(key, url)
 
                 dict        = parse(url, soup)
+                if dict:
+                    print dict
             else:
-                print "%s already crawled ....." % (url)
+#               print "%s already crawled ....." % (url)
 
         except:
-
             print "error ........."
             pass
 
