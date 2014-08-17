@@ -69,7 +69,7 @@ def init(queue):
 
 
     count = 0
-    while count< 1000:
+    while count< 3:
         count +=1
         try:
             
@@ -95,6 +95,7 @@ def init(queue):
                     print dict
             else:
 #               print "%s already crawled ....." % (url)
+                pass
 
         except:
             print "error ........."
